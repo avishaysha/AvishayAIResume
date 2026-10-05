@@ -66,18 +66,6 @@
         <div class="hero__photo-bg" aria-hidden="true"></div>
         <img src="/portrait.jpg" alt="אבישי אויזרץ" width="900" height="1125">
       </div>
-      <div class="float-card float-card--a" data-float aria-hidden="true">
-        <div class="float-card__inner">
-          <span class="float-card__check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
-          <span class="float-card__text"><strong>סיכום מועמד מוכן</strong><small>בוט קורות חיים</small></span>
-        </div>
-      </div>
-      <div class="float-card float-card--b" data-float aria-hidden="true">
-        <div class="float-card__inner">
-          <span class="pulse-dot"></span>
-          <span class="float-card__text"><strong>פנייה חדשה נפתחה</strong><small>פורטל עובדים</small></span>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -167,15 +155,29 @@
       </article>
 
       <article class="project" data-reveal-card>
-        <div class="mini mini--row" aria-hidden="true">
-          <div class="cv-doc"><span class="cv-doc__avatar"></span><i style="width:90%"></i><i style="width:70%"></i><i style="width:85%"></i><i style="width:60%"></i><i style="width:80%"></i><i style="width:50%"></i></div>
-          <div class="cv-summary">
-            <span class="mini__label">סיכום מועמד</span>
-            <i class="line" style="width:92%"></i><i class="line line--dim" style="width:70%"></i>
-            <span class="mini__label mini__label--gap">התאמה למשרות</span>
-            <div class="match"><span>מנהלת משרד</span><span class="match__track"><span class="match__bar" data-bar style="--v:92%"></span></span><b dir="ltr">92%</b></div>
-            <div class="match"><span>רכזת גיוס</span><span class="match__track"><span class="match__bar match__bar--2" data-bar style="--v:78%"></span></span><b dir="ltr">78%</b></div>
-            <div class="match"><span>שירות לקוחות</span><span class="match__track"><span class="match__bar match__bar--3" data-bar style="--v:61%"></span></span><b dir="ltr">61%</b></div>
+        <div class="mini story mini--cv" aria-hidden="true" data-story="cv">
+          <div class="steps">
+            <ol class="steps__list"><li class="is-done" data-step>התקבל</li><li class="is-done" data-step>נקרא</li><li class="is-done" data-step>סוכם</li><li class="is-done" data-step>הותאם</li></ol>
+            <span class="steps__track"><span class="steps__fill" data-steps-fill></span></span>
+          </div>
+          <div class="cv-stage" data-stage>
+            <div class="cv-doc" data-doc>
+              <span class="cv-doc__avatar"></span><i style="width:90%"></i><i style="width:70%"></i><i style="width:85%"></i><i style="width:60%"></i><i style="width:80%"></i><i style="width:50%"></i>
+              <span class="cv-doc__name" dir="ltr">CV.pdf</span>
+              <span class="cv-doc__scan" data-scan></span>
+            </div>
+            <div class="cv-result">
+              <span class="mini__label">סיכום מועמד</span>
+              <ul class="cv-points">
+                <li data-point>5 שנות ניסיון בניהול משרד</li>
+                <li data-point>שליטה באקסל וב-CRM</li>
+                <li data-point>זמינה למשרה מלאה</li>
+              </ul>
+              <span class="mini__label">התאמה למשרות</span>
+              <div class="match is-top" data-match><span>מנהלת משרד</span><span class="match__track"><span class="match__bar" data-bar style="--v:92%"></span></span><b dir="ltr" data-count="92">92%</b></div>
+              <div class="match" data-match><span>רכזת גיוס</span><span class="match__track"><span class="match__bar match__bar--2" data-bar style="--v:78%"></span></span><b dir="ltr" data-count="78">78%</b></div>
+              <div class="match" data-match><span>שירות לקוחות</span><span class="match__track"><span class="match__bar match__bar--3" data-bar style="--v:61%"></span></span><b dir="ltr" data-count="61">61%</b></div>
+            </div>
           </div>
         </div>
         <div class="project__meta"><span class="project__num">03</span><span class="project__tag">גיוס והשמה</span></div>
@@ -185,11 +187,13 @@
       </article>
 
       <article class="project" data-reveal-card>
-        <div class="mini mini--list" aria-hidden="true">
-          <span class="mini__heading">הפעילויות הקרובות</span>
-          <div class="activity"><span><strong>רכיבה על אופניים</strong><small>יום ג׳ · 17:00</small></span><span class="signup" data-signup><span class="signup__label">להרשמה</span><span class="signup__done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>נרשמת</span></span></div>
-          <div class="activity"><span><strong>שייט בקיאקים</strong><small>יום ה׳ · 09:00</small></span><span class="signup is-done"><span class="signup__label">להרשמה</span><span class="signup__done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>נרשמת</span></span></div>
-          <div class="activity"><span><strong>סדנת בישול</strong><small>יום ו׳ · 10:30</small></span><span class="signup"><span class="signup__label">להרשמה</span><span class="signup__done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>נרשמת</span></span></div>
+        <div class="mini story mini--list" aria-hidden="true" data-story="portal">
+          <div class="portal-head" data-portal-head><span class="portal-hello">שלום, מיכל</span><span class="mini__label">הפעילויות הקרובות שלך</span></div>
+          <div class="activity" data-act><span><strong>רכיבה על אופניים</strong><small>יום ג׳ · 17:00</small></span><span class="signup is-done" data-signup><span class="signup__label">להרשמה</span><span class="signup__done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>נרשמת</span></span></div>
+          <div class="activity" data-act><span><strong>שייט בקיאקים</strong><small>יום ה׳ · 09:00</small></span><span class="signup"><span class="signup__label">להרשמה</span><span class="signup__done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>נרשמת</span></span></div>
+          <div class="activity" data-act><span><strong>סדנת בישול</strong><small>יום ו׳ · 10:30</small></span><span class="signup"><span class="signup__label">להרשמה</span><span class="signup__done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>נרשמת</span></span></div>
+          <span class="tap" data-tap></span>
+          <div class="toast" data-toast><span class="toast__icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span><strong>ההרשמה נקלטה</strong><small>רכיבה על אופניים · יום ג׳ 17:00</small></span></div>
         </div>
         <div class="project__meta"><span class="project__num">04</span><span class="project__tag">עמותה</span></div>
         <h3 class="project__title">פורטל משתתפים לעמותה</h3>
@@ -198,16 +202,22 @@
       </article>
 
       <article class="project" data-reveal-card>
-        <div class="mini mini--list" aria-hidden="true">
-          <div class="mini__head"><span class="mini__heading">הפניות שלי</span><span class="mini__new">+ פנייה חדשה</span></div>
-          <div class="ticket" data-new-ticket><span class="ticket__id" dir="ltr">#1043</span><span class="ticket__title">בקשה לציוד לכיתה</span><span class="status status--new">חדשה</span></div>
-          <div class="ticket"><span class="ticket__id" dir="ltr">#1042</span><span class="ticket__title">אישור ימי חופשה</span><span class="status status--progress">בטיפול</span></div>
-          <div class="ticket"><span class="ticket__id" dir="ltr">#1041</span><span class="ticket__title">עדכון פרטי בנק</span><span class="status status--progress">בטיפול</span></div>
-          <div class="ticket" data-old-ticket><span class="ticket__id" dir="ltr">#1040</span><span class="ticket__title">תקלה במחשב הנייד</span><span class="status status--closed">נסגרה</span></div>
+        <div class="mini story mini--list" aria-hidden="true" data-story="tickets">
+          <div class="mini__head" data-head><span class="mini__heading">הפניות שלי</span><span class="mini__new" data-new-btn>+ פנייה חדשה</span></div>
+          <div class="ticket-list" data-list>
+            <div class="ticket" data-ticket-new><span class="ticket__id" dir="ltr">#1043</span><span class="ticket__title">אישור ימי חופשה</span><span class="status status--done" data-status><span data-s="new">חדשה</span><span data-s="progress">בטיפול</span><span data-s="done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>טופלה</span></span></div>
+            <div class="ticket"><span class="ticket__id" dir="ltr">#1042</span><span class="ticket__title">עדכון פרטי בנק</span><span class="status status--progress">בטיפול</span></div>
+            <div class="ticket"><span class="ticket__id" dir="ltr">#1041</span><span class="ticket__title">תקלה במחשב הנייד</span><span class="status status--done"><span data-s="done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>טופלה</span></span></div>
+          </div>
+          <div class="ticket-form" data-form>
+            <span class="mini__label">נושא הפנייה</span>
+            <div class="field"><span data-typed>אישור ימי חופשה</span><i class="caret"></i></div>
+            <div class="form-row"><span class="chip" data-chip>משאבי אנוש</span><span class="send" data-send>שליחה</span></div>
+          </div>
         </div>
-        <div class="project__meta"><span class="project__num">05</span><span class="project__tag">רשת עתיד</span></div>
+        <div class="project__meta"><span class="project__num">05</span><span class="project__tag">רשת חינוך</span></div>
         <h3 class="project__title">פורטל פניות עובדים</h3>
-        <p class="project__desc">עבור רשת עתיד. עובדי הרשת פותחים פנייה במקום אחד ועוקבים אחרי הסטטוס שלה עד שהיא מטופלת, בלי מיילים שהולכים לאיבוד.</p>
+        <p class="project__desc">עבור רשת חינוך. עובדי הרשת פותחים פנייה במקום אחד ועוקבים אחרי הסטטוס שלה עד שהיא מטופלת, בלי מיילים שהולכים לאיבוד.</p>
         <ul class="chips" aria-label="טכנולוגיות"><li>Zite</li><li>אוטומציות</li><li>ניהול פניות</li></ul>
       </article>
 
