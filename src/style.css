@@ -168,16 +168,81 @@ h1, h2, h3, p { margin: 0; }
 .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
 .service {
   background: var(--surface); border: 1px solid var(--line); border-radius: 24px;
-  padding: 28px; display: flex; flex-direction: column; gap: 14px;
-  transition: border-color .3s, transform .3s var(--ease-out);
+  padding: 22px; display: flex; flex-direction: column; gap: 16px;
+  transition: border-color .35s, translate .35s var(--ease-out);
 }
-.service:hover { border-color: rgba(200, 240, 49, 0.35); transform: translateY(-4px); }
+.service:hover { border-color: rgba(200, 240, 49, 0.4); translate: 0 -6px; }
+.service__head { display: flex; align-items: center; gap: 12px; }
 .service__icon {
-  display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px;
-  background: var(--accent-soft); color: var(--accent);
+  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px;
+  background: var(--accent-soft); color: var(--accent); flex: none;
 }
 .service h3 { font-family: var(--font-display); font-weight: 700; font-size: 26px; }
 .service p { font-size: 16px; line-height: 1.7; color: var(--muted); }
+
+/* Service illustrations (final state in markup; main.js loops them while on screen) */
+.svc-illus {
+  position: relative; height: 150px; border-radius: 16px; overflow: hidden;
+  background: var(--surface-3); border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.svc-illus i { display: block; height: 6px; border-radius: 3px; }
+
+/* AI: document lines flow into a spark and come out as a summary */
+.svc-doc { position: absolute; right: 22px; top: 50%; translate: 0 -50%; display: flex; flex-direction: column; gap: 11px; }
+.svc-doc i { background: #4A4A55; }
+.svc-spark {
+  position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px;
+  display: grid; place-items: center; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+}
+.svc-sum { position: absolute; left: 20px; top: 50%; translate: 0 -50%; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.svc-sum__check {
+  display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-ink);
+}
+.svc-sum__l1 { width: 72px; height: 7px !important; background: var(--accent); }
+.svc-sum__l2 { width: 46px; height: 7px !important; background: rgba(200, 240, 49, 0.55); }
+
+/* Automations: a dot runs form → automation → update */
+.svc-track { position: absolute; left: 44px; right: 44px; top: 52px; height: 2px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.svc-track__fill { position: absolute; top: 0; bottom: 0; right: 0; width: 100%; background: var(--accent); }
+.svc-dot {
+  position: absolute; top: 48px; left: 39px; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 14px 3px rgba(200, 240, 49, 0.6); opacity: 0;
+}
+.svc-flow { position: absolute; top: 31px; right: 22px; left: 22px; display: flex; justify-content: space-between; }
+.svc-node {
+  display: flex; flex-direction: column; align-items: center; gap: 10px; width: 44px;
+  font-size: 12px; color: var(--subtle); white-space: nowrap;
+}
+.svc-node__icon {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.12); background: var(--surface-2); color: var(--subtle);
+  transition: border-color .3s, background-color .3s, color .3s;
+}
+.svc-node.is-on .svc-node__icon { border-color: var(--accent); background: rgba(200, 240, 49, 0.16); color: var(--accent); }
+
+/* CRM: a lead moves through the pipeline and becomes a client */
+.svc-pipe { position: absolute; inset: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.svc-col {
+  display: flex; flex-direction: column; gap: 8px; padding: 6px; border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025); font-size: 11px; font-weight: 500; color: var(--subtle);
+}
+.svc-col i { height: 30px; margin-top: 30px; border-radius: 8px; background: var(--surface-2); opacity: .5; }
+.svc-lead {
+  position: absolute; top: 40px; left: 18px; width: 84px; display: flex; align-items: center; gap: 7px;
+  padding: 8px; border-radius: 10px; background: #24242E; border: 1.5px solid var(--accent);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); transition: border-color .3s;
+}
+.svc-lead.is-pending { border-color: rgba(255, 255, 255, 0.1); }
+.svc-lead__avatar { width: 20px; height: 20px; border-radius: 50%; background: var(--blue); flex: none; }
+.svc-lead__lines { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.svc-lead__lines i { height: 5px; background: rgba(255, 255, 255, 0.4); }
+.svc-lead__lines i + i { width: 60%; background: rgba(255, 255, 255, 0.18); }
+.svc-lead__won {
+  position: absolute; top: -8px; left: -8px; display: grid; place-items: center;
+  width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--accent-ink);
+}
+.svc-lead__won svg { width: 11px; height: 11px; }
 
 /* ---------- Projects ---------- */
 .project {

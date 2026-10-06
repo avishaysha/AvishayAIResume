@@ -62,6 +62,11 @@ if (motionOk) {
     offset: ['start end', 'end start'],
   })
 
+  // Service cards: each illustration acts out its field, looping while it is on screen
+  playWhileVisible($('[data-svc="ai"]'), aiStory)
+  playWhileVisible($('[data-svc="auto"]'), autoStory)
+  playWhileVisible($('[data-svc="crm"]'), crmStory)
+
   // Project stories: each mini UI acts out the product, looping while it is on screen
   playWhileVisible($('[data-story="cv"]'), cvStory)
   playWhileVisible($('[data-story="portal"]'), portalStory)
@@ -247,5 +252,99 @@ function ticketsStory(root) {
     setStatus('done')
     await wait(2600)
     await animate([head, list], { opacity: 0 }, { duration: 0.4 })
+  }
+}
+
+// ---------- Service illustrations ----------
+
+// AI: document lines flow into the spark and come out as a short summary
+function aiStory(root) {
+  const doc = $('[data-doc-lines]', root)
+  const lines = $$('i', doc)
+  const spark = $('[data-spark]', root)
+  const check = $('[data-sum-check]', root)
+  const sum = $$('[data-sum-line]', root)
+  const widths = sum.map((el) => el.offsetWidth)
+  const noGlow = '0 0 0 0 rgba(200,240,49,0), 0 0 0 0 rgba(200,240,49,0)'
+  const glow = '0 0 0 10px rgba(200,240,49,0.18), 0 0 30px 6px rgba(200,240,49,0.35)'
+
+  return async () => {
+    const travel = doc.offsetLeft - spark.offsetLeft
+    set(lines, { x: 0, opacity: 0 })
+    set(sum, { width: 0, opacity: 1 })
+    set(check, { scale: 0, opacity: 0 })
+    await animate(lines, { opacity: 1 }, { duration: 0.4, delay: stagger(0.06) })
+    await wait(400)
+
+    animate(lines, { x: -travel, opacity: 0 }, { duration: 0.7, delay: stagger(0.1), ease: [0.55, 0, 0.75, 0.25] })
+    await wait(650)
+    animate(spark, { scale: [1, 1.25, 1], rotate: [0, 90] }, { duration: 0.8, ease })
+    await animate(spark, { boxShadow: [noGlow, glow, noGlow] }, { duration: 1 })
+
+    await animate(sum[0], { width: [0, widths[0]] }, { duration: 0.45, ease })
+    await animate(sum[1], { width: [0, widths[1]] }, { duration: 0.35, ease })
+    await animate(check, { scale: [0, 1.2, 1], opacity: 1 }, { duration: 0.45, ease })
+    await wait(1700)
+    await animate([...sum, check], { opacity: 0 }, { duration: 0.4 })
+  }
+}
+
+// Automations: a dot runs from the form, through the automation, to the update
+function autoStory(root) {
+  const track = $('[data-track]', root)
+  const fill = $('[data-track-fill]', root)
+  const dot = $('[data-dot]', root)
+  const nodes = $$('[data-node]', root)
+  const reach = (node) => {
+    node.classList.add('is-on')
+    animate(node.firstElementChild, { scale: [1, 1.15, 1] }, { duration: 0.4 })
+  }
+
+  return async () => {
+    const len = track.offsetWidth
+    nodes.forEach((n) => n.classList.remove('is-on'))
+    set(fill, { width: '0%' })
+    set(dot, { x: len, opacity: 0 })
+    await wait(300)
+
+    reach(nodes[0])
+    await animate(dot, { opacity: 1 }, { duration: 0.25 })
+    animate(fill, { width: '50%' }, { duration: 1, ease: 'easeInOut' })
+    await animate(dot, { x: len / 2 }, { duration: 1, ease: 'easeInOut' })
+    reach(nodes[1])
+    await wait(300)
+    animate(fill, { width: '100%' }, { duration: 1, ease: 'easeInOut' })
+    await animate(dot, { x: 0 }, { duration: 1, ease: 'easeInOut' })
+    reach(nodes[2])
+    await animate(dot, { opacity: 0 }, { duration: 0.3 })
+    await wait(1600)
+  }
+}
+
+// CRM: a lead moves through the pipeline and becomes a client
+function crmStory(root) {
+  const lead = $('[data-lead]', root)
+  const won = $('[data-won]', root)
+  const cols = $$('[data-col]', root)
+  const pipe = cols[0].parentElement
+  const move = (x) => animate(lead, { x }, { duration: 0.7, ease: [0.65, 0, 0.35, 1] })
+
+  return async () => {
+    // Column centres relative to where the card sits in the markup (the last column)
+    const base = lead.offsetLeft + lead.offsetWidth / 2
+    const dx = cols.map((c) => pipe.offsetLeft + c.offsetLeft + c.offsetWidth / 2 - base)
+    lead.classList.add('is-pending')
+    set(won, { scale: 0, opacity: 0 })
+    set(lead, { x: dx[0], y: 10, opacity: 0 })
+    await animate(lead, { y: 0, opacity: 1 }, { duration: 0.4, ease })
+    await wait(700)
+
+    await move(dx[1])
+    await wait(800)
+    await move(dx[2])
+    lead.classList.remove('is-pending')
+    await animate(won, { scale: [0, 1.25, 1], opacity: 1 }, { duration: 0.45, ease })
+    await wait(1700)
+    await animate(lead, { opacity: 0 }, { duration: 0.4 })
   }
 }
