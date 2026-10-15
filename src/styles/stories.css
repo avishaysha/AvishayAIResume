@@ -1,0 +1,73 @@
+/* Package `stories`: monitor chrome for the six looping demos, and the service heads' power-on.
+   Everything that differs from the static page is gated on html.fx-stories (added only when motion is
+   allowed), so a failed or stubbed package leaves the foundation's final states untouched. */
+
+/* ---------- progress hairline (JS-created, inside each .svc-illus / .mini.story) ---------- */
+/* A faint 2px track at the monitor's foot. The lime fill grows right to left (transform-origin right),
+   and a short bright tip leads it: the page's grammar of a progress line led by the packet. */
+.story__progress {
+  position: absolute; inset-inline: 0; bottom: 0; z-index: 4;
+  height: 2px;
+  background: rgba(243, 242, 238, 0.07);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .35s var(--ease-out);
+}
+.fx-stories .is-playing > .story__progress { opacity: 1; }
+.story__progress-fill {
+  position: absolute; inset: 0;
+  background: var(--lime);
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+}
+/* the tip rides a full-width carrier translated by -progress * 100%: its leading (left) end sits on
+   the fill's moving edge; at 0 it waits just outside the right edge (clipped by the monitor) */
+.story__progress-run { position: absolute; inset: 0; }
+.story__progress-tip {
+  position: absolute; top: 0; left: 100%;
+  width: 28px; height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--packet-core), rgba(228, 255, 122, 0));
+  box-shadow: -2px 0 10px 1px var(--lime-glow);
+}
+/* cycle 1 measures itself: an indeterminate seek, right to left, every 1.2s */
+.story__progress.is-measuring .story__progress-tip {
+  width: 34%;
+  background: linear-gradient(to right, rgba(228, 255, 122, 0), var(--lime) 45%, var(--packet-core) 55%, rgba(228, 255, 122, 0));
+  box-shadow: none;
+}
+.story__progress.is-measuring .story__progress-run { animation: story-seek 1.2s var(--ease-io) infinite; }
+@keyframes story-seek {
+  from { transform: translateX(0); }
+  to { transform: translateX(-134%); }
+}
+
+/* restore = one frame: no CSS transition may ease the final state back in */
+.story-snap, .story-snap * { transition: none !important; }
+
+/* click / tap replays a monitor */
+@media (hover: hover) and (pointer: fine) {
+  .fx-stories:not(.is-paused) :is(.svc-illus[data-svc], .mini.story[data-story]) { cursor: pointer; }
+}
+
+/* ---------- "הדגמה": the demo's LED is lime and pulsing only while its story plays ---------- */
+.fx-stories .project .demo-label .pulse-dot {
+  animation: none;
+  background: var(--subtle);
+  transition: background-color .4s var(--ease-out);
+}
+.fx-stories .project.is-demo-live .demo-label .pulse-dot {
+  background: var(--lime);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.fx-stories.is-paused .demo-label .pulse-dot { transition: none; }
+
+/* ---------- service heads: idea until the packet arrives, then the icon powers on ---------- */
+/* (the name's thin/ghost idea state is the foundation's compile contract, gated on fx-stories) */
+.motion-ok.fx-stories .service__icon {
+  transition: background-color .5s var(--ease-out) var(--svc-on, 0s), color .5s var(--ease-out) var(--svc-on, 0s);
+}
+.motion-ok.fx-stories .service:not(.is-live) .service__icon {
+  background: rgba(243, 242, 238, 0.05);
+  color: var(--c-idea);
+}

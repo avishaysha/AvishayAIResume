@@ -1,0 +1,191 @@
+/* ==========================================================================
+   finale: dock dot, bloom, process run, contact rows, odometer, copy;
+   footer signature, run receipt, rerun.
+   Every hidden / "idea" initial state is gated on html.motion-ok.fx-finale, so a failed or stubbed
+   package (or reduced motion) leaves the foundation's finished page. Interaction styles (row fill,
+   copy) are gated on .fx-finale only: the package also runs, without motion, under reduced motion.
+   ========================================================================== */
+
+/* ---------- bloom: lime grows out of the dock dot (finale.js writes --r / --cx / --cy in px) ---------- */
+.motion-ok.fx-finale .finale__flood {
+  clip-path: circle(var(--r, 0px) at var(--cx, 50%) var(--cy, 50%));
+}
+
+/* Once lime meets lime the card's edge would vanish, and with it the edge the thread's last stub plugs
+   into: a faint ink hairline keeps the card legible as the device the packet docked in. On ink (before
+   the bloom) it sits against ink and reads as nothing. */
+.motion-ok.fx-finale .contact::after {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1.5px rgba(12, 12, 16, 0.16);
+  pointer-events: none;
+}
+
+/* ---------- the dock dot: a status light beside the number ---------- */
+.fx-finale .row__dot {
+  position: relative;
+  color: var(--on-lime);
+  background: currentColor;
+  transition: color .3s var(--ease-out), box-shadow .3s var(--ease-out);
+}
+.motion-ok.fx-finale .row__dot:not(.is-docked) { transform: scale(0); }
+.motion-ok.fx-finale .row__dot::before,
+.motion-ok.fx-finale .row__dot::after {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+/* arrival: one ring leaves the dot */
+.motion-ok.fx-finale .row__dot::after { border: 1.5px solid currentColor; }
+.motion-ok.fx-finale .row__dot.is-ring::after { animation: finale-ring .7s var(--ease-out) 1 both; }
+/* then a slow status pulse, only while it is on screen (and paused by html.is-paused) */
+.motion-ok.fx-finale .row__dot::before { background: currentColor; }
+.motion-ok.fx-finale .row__dot.is-live.is-seen::before { animation: finale-pulse 2.8s var(--ease-out) infinite; }
+@keyframes finale-ring {
+  from { transform: scale(1); opacity: .8; }
+  to { transform: scale(3); opacity: 0; }
+}
+@keyframes finale-pulse {
+  0% { transform: scale(1); opacity: .32; }
+  62%, 100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* ---------- rows: ink fill from the bottom, lime text (14.8:1) ---------- */
+/* the text flips while the fill passes its middle, so it never lingers in a muddy in-between */
+.fx-finale .row { transition: color .2s var(--ease-out); }
+.fx-finale .row::before {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  background: var(--on-lime);
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+  transition: transform .45s var(--ease-out);
+}
+.fx-finale .row .row__label { transition: color .2s var(--ease-out); }
+.fx-finale .row:focus-visible { color: var(--lime); }
+.fx-finale .row:focus-visible::before { transform: scaleY(1); }
+.fx-finale .row:focus-visible .row__label,
+.fx-finale .row:focus-visible .row__dot { color: var(--lime); }
+.fx-finale .row:focus-visible .row__dot { box-shadow: var(--glow); }
+.fx-finale .row:focus-visible .row__arrow { transform: translateX(-6px); }
+@media (hover: hover) {
+  .fx-finale .row:hover { color: var(--lime); }
+  .fx-finale .row:hover::before { transform: scaleY(1); }
+  .fx-finale .row:hover .row__label,
+  .fx-finale .row:hover .row__dot { color: var(--lime); }
+  .fx-finale .row:hover .row__dot { box-shadow: var(--glow); }
+}
+/* touch: a short press shows the fill too */
+.fx-finale .row:active::before { transform: scaleY(1); }
+.fx-finale .row:active { color: var(--lime); }
+.fx-finale .row:active .row__label,
+.fx-finale .row:active .row__dot { color: var(--lime); }
+
+/* ---------- odometer: 1em cells; a 0..d column rolls up during the roll, then plain text again ---------- */
+.fx-finale .odo__d { position: relative; line-height: 1em; }
+.odo__d.is-rolling {
+  -webkit-text-fill-color: transparent;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 .12em, #000 .88em, transparent 1em);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 .12em, #000 .88em, transparent 1em);
+}
+.odo__col {
+  position: absolute; inset-inline: 0; top: 0;
+  display: flex; flex-direction: column;
+  -webkit-text-fill-color: currentColor;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+}
+.odo__col > span { display: block; height: 1em; line-height: 1em; text-align: center; }
+
+/* ---------- process: an ink runner lights the steps right to left ---------- */
+.motion-ok.fx-finale .process { container-type: inline-size; }
+.motion-ok.fx-finale .process::before {
+  /* lit (ink) from the first step up to the runner, a faint route after it */
+  background: linear-gradient(to left, var(--on-lime) calc(var(--pp, 0) * 100%), rgba(12, 12, 16, 0.2) calc(var(--pp, 0) * 100%));
+}
+.motion-ok.fx-finale .process::after {
+  content: '';
+  position: absolute; top: 3px; inset-inline-start: calc(12.5% - 7px);
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--on-lime);
+  box-shadow: 0 0 0 4px var(--lime);
+  transform: translateX(calc(var(--pp, 0) * -75cqi));
+  opacity: 0;
+  transition: opacity .2s var(--ease-out);
+  pointer-events: none;
+}
+.motion-ok.fx-finale .process.is-running::after { opacity: 1; }
+.motion-ok.fx-finale .process__node { transform: scale(.78); opacity: .45; transition: opacity .3s var(--ease-out); }
+.motion-ok.fx-finale .process__label { opacity: .62; transition: opacity .35s var(--ease-out); } /* >= 5:1 while dimmed */
+.motion-ok.fx-finale .process__step.is-lit .process__node { transform: none; opacity: 1; }
+.motion-ok.fx-finale .process__step.is-lit .process__label { opacity: 1; }
+.motion-ok.fx-finale .process.is-instant .process__node,
+.motion-ok.fx-finale .process.is-instant .process__label { transition: none; } /* paused: lit at once */
+
+/* ---------- copy ---------- */
+.fx-finale .copy {
+  min-width: 6.2em;
+  transition: background-color .25s var(--ease-out), color .25s var(--ease-out);
+}
+.fx-finale .copy [data-copy-label] { display: inline-block; }
+@media (hover: hover) {
+  .fx-finale .copy:hover { background: var(--on-lime); color: var(--lime); }
+}
+.fx-finale .copy.is-copied { background: var(--on-lime); color: var(--lime); }
+
+/* ---------- footer signature: the period pops after the compile ---------- */
+.motion-ok.fx-finale .sig:not(.is-signed) .period { transform: scale(0); }
+
+/* ---------- receipt: lines print right to left, a caret, then the visitor's own time ---------- */
+/* times and "—" sit flush against the stage name (the column's start in RTL) */
+.motion-ok.fx-finale .receipt__t { text-align: right; font-variant-numeric: tabular-nums; }
+.motion-ok.fx-finale .receipt__list li,
+.motion-ok.fx-finale .receipt__total-text {
+  transition:
+    opacity var(--rc-d, .45s) var(--ease-out) calc(var(--k, 0) * 90ms),
+    transform var(--rc-d, .45s) var(--ease-out) calc(var(--k, 0) * 90ms);
+}
+.motion-ok.fx-finale .receipt__list li:nth-child(2) { --k: 1; }
+.motion-ok.fx-finale .receipt__list li:nth-child(3) { --k: 2; }
+.motion-ok.fx-finale .receipt__list li:nth-child(4) { --k: 3; }
+.motion-ok.fx-finale .receipt__list li:nth-child(5) { --k: 4; }
+.motion-ok.fx-finale .receipt__list li:nth-child(6) { --k: 5; }
+.motion-ok.fx-finale .receipt:not(.is-printed) .receipt__list li { opacity: 0; transform: translateX(8px); }
+/* rewind (rerun): bottom line first, quickly */
+.motion-ok.fx-finale .receipt.is-rewinding .receipt__list li { --rc-d: .3s; transition-delay: calc((5 - var(--k, 0)) * 40ms); }
+.motion-ok.fx-finale .receipt.is-instant .receipt__list li,
+.motion-ok.fx-finale .receipt.is-instant .receipt__total-text { transition: none; }
+
+.motion-ok.fx-finale .receipt__total-text { --k: 0; display: inline-block; }
+.motion-ok.fx-finale .receipt:not(.is-total) .receipt__total-text { opacity: 0; transform: translateX(8px); }
+.motion-ok.fx-finale .receipt__total bdi { font-variant-numeric: tabular-nums; }
+.receipt__caret {
+  display: inline-block;
+  width: .6em; height: 1.1em;
+  margin-inline-start: .35em;
+  vertical-align: -0.22em;
+  background: var(--lime);
+  opacity: 0;
+}
+.motion-ok.fx-finale .receipt.is-caret .receipt__caret { opacity: 1; }
+.motion-ok.fx-finale .receipt.is-caret.is-seen .receipt__caret { animation: finale-caret 1.06s steps(1, end) infinite; }
+@keyframes finale-caret { 50% { opacity: 0; } }
+
+/* ---------- mobile ---------- */
+@media (max-width: 600px) {
+  /* the address keeps the full row; the copy button takes its own line under it (start-aligned) */
+  .fx-finale .row-wrap > .row { flex-basis: 100%; }
+  .fx-finale .copy { position: relative; min-height: 48px; margin: 8px 6px 18px; }
+  /* a >= 64px tap target (10px of invisible hit area above and below the 48px pill), clear of the link */
+  .fx-finale .copy::after { content: ''; position: absolute; inset: -10px -6px; }
+  .motion-ok.fx-finale .process::after { width: 12px; height: 12px; top: 4px; inset-inline-start: calc(12.5% - 6px); box-shadow: 0 0 0 3px var(--lime); }
+}
+
+/* ---------- reduced motion: everything is already final; the global rule kills transitions ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .receipt__caret { display: none; }
+}

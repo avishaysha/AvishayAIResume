@@ -1,0 +1,123 @@
+/* ==========================================================================
+   Package `keyhole` (src/fx/keyhole.js): the colossal "AI" you dive through into the lecture photo.
+   Every rule is gated on html.fx-keyhole AND a mode class on [data-keyhole], so a stubbed, failed or
+   reduced-motion run keeps the foundation's static two-column talks layout untouched.
+     .is-pinned   sticky full-bleed stage (220svh wrapper, 170svh at <= 768px)
+       .is-ready    the canvas mask is drawable (Rubik loaded): kicker and mask shown
+       .kh-split    end frame: photo framed on the left, text column on the right (wide landscape)
+       .kh-stack    end frame: photo framed on top, text at the bottom (phones, portrait tablets)
+     .is-wipe     fallback (no canvas / no font / very short viewport): static layout + clip-wipe reveal
+   JS writes only custom properties (--kh-*), consumed here, so removing html.fx-keyhole restores
+   the static page exactly.
+   ========================================================================== */
+
+/* ---------- PINNED: wrapper and sticky stage ---------- */
+.fx-keyhole .keyhole.is-pinned {
+  height: 220vh;
+  height: 220svh;
+}
+@media (max-width: 768px) {
+  .fx-keyhole .keyhole.is-pinned {
+    height: 170vh;
+    height: 170svh; /* 70svh of pinned scroll on phones: a short pin */
+  }
+}
+
+.fx-keyhole .keyhole.is-pinned .keyhole__stage {
+  position: sticky; top: 0;
+  display: block;
+  width: 100%; max-width: none;
+  height: 100vh; height: 100svh;
+  margin: 0; padding: 0;
+  overflow: clip;
+  z-index: var(--z-stage);
+  isolation: isolate;
+  background: var(--ink);
+}
+
+/* layer 1: the photo, full-bleed; JS drives the img transform (dive zoom, then the FLIP into its
+   frame) and the figure's clip-path (the frame) */
+.fx-keyhole .keyhole.is-pinned .talk__media {
+  position: absolute; inset: 0; z-index: 0;
+  aspect-ratio: auto;
+  border: 0; border-radius: 0;
+  background: var(--surface-2); /* before the photo decodes, the letters still read as shapes */
+  clip-path: var(--kh-clip, none);
+  pointer-events: none;
+}
+/* the img box holds the WHOLE bitmap at its stage-cover size (object-fit would clip the cropped parts
+   to the box, and the FLIP needs them); the figure clips it to the stage */
+.fx-keyhole .keyhole.is-pinned .talk__media img {
+  position: absolute;
+  left: var(--kh-ix, 0px); top: var(--kh-iy, 0px);
+  width: var(--kh-iw, 100%); height: var(--kh-ih, 100%);
+  max-width: none;
+  object-fit: cover;
+  object-position: 62% 30%;
+  transform-origin: 0 0;
+  transform: var(--kh-img, none);
+  will-change: transform;
+}
+
+/* layer 2: the ink mask with "AI"-shaped holes (2D canvas, destination-out) */
+.keyhole__mask { display: none; }
+.fx-keyhole .keyhole.is-pinned.is-ready .keyhole__mask {
+  display: block;
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%;
+  opacity: var(--kh-mask-o, 1);
+  visibility: var(--kh-mask-v, visible);
+  pointer-events: none;
+}
+
+/* layer 3: the kicker "גם מרצה על", above and to the right of the AI (a right-to-left staircase into
+   the I). Measured while hidden, shown once the mask is drawable. */
+.fx-keyhole .keyhole.is-pinned .keyhole__kicker {
+  display: block;
+  position: absolute; z-index: 2;
+  top: var(--kh-kt, 0px); left: var(--kh-kl, 0px);
+  margin: 0;
+  font-family: var(--font-display); font-weight: 800;
+  font-size: var(--kh-kfs, 7vw); line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  color: var(--text);
+  visibility: hidden;
+  pointer-events: none;
+}
+.fx-keyhole .keyhole.is-pinned.is-ready .keyhole__kicker {
+  visibility: var(--kh-k-v, visible);
+  opacity: var(--kh-k-o, 1);
+  transform: translate3d(var(--kh-k-x, 0px), 0, 0);
+}
+
+/* layer 4: the talk text, on plain ink once the photo has framed itself */
+.fx-keyhole .keyhole.is-pinned .talk__text {
+  position: absolute; z-index: 3;
+  margin: 0;
+}
+.fx-keyhole .keyhole.is-pinned .talk__text > * {
+  opacity: var(--kh-o, 1);
+  transform: translate3d(0, var(--kh-y, 0px), 0);
+}
+/* hidden or still rising: not clickable (it stays focusable: focusin jumps to the end state) */
+.fx-keyhole .keyhole.is-pinned .talk__text.kh-off { pointer-events: none; }
+
+/* wide landscape: the text column on the right, vertically centred on the frame */
+.fx-keyhole .keyhole.is-pinned.kh-split .talk__text {
+  top: var(--kh-tt, 76px); bottom: var(--kh-tb, 0px);
+  left: var(--kh-tl, 60vw); width: var(--kh-tw, 32vw);
+  justify-content: center;
+}
+/* phones and portrait tablets: the text at the bottom, the frame takes the space above it */
+.fx-keyhole .keyhole.is-pinned.kh-stack .talk__text {
+  left: var(--gutter); right: var(--gutter);
+  bottom: max(20px, 2.8svh);
+}
+.fx-keyhole .keyhole.is-pinned.kh-stack .talk__text .section__title { margin-bottom: 18px; }
+.fx-keyhole .keyhole.is-pinned.kh-stack .talk__text .section__eyebrow { margin-bottom: 16px; }
+.fx-keyhole .keyhole.is-pinned.kh-stack .talk__desc { margin-bottom: 10px; }
+
+/* ---------- FALLBACK: the clip-wipe reveal on the static layout ---------- */
+.fx-keyhole .keyhole.is-wipe:not(.is-revealed) .talk__media { clip-path: inset(0 0 0 100%); }
+.fx-keyhole .keyhole.is-wipe:not(.is-revealed) .talk__media img { transform: scale(1.18); }

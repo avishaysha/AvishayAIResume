@@ -1,0 +1,208 @@
+/* ==========================================================================
+   Package `chrome`: the nav (retint, progress line, LED), the tools bus, the CTA flood and magnet,
+   heading reveals, the highlighter and the one sheet-depth transition.
+   Everything that moves, and every hidden initial state, is gated on html.fx-chrome.motion-ok, so a
+   failed package (main.js removes .fx-chrome) or reduced motion leaves foundation's finished page.
+   Under reduced motion chrome only retints the nav (no transitions), keeps the progress bar as a
+   static position indicator and swaps hover colours instantly (section 9).
+   ========================================================================== */
+
+/* ---------- 1. Nav: theme transitions (.3s) ----------
+   The bar crossfades on a steep in-out curve (it crosses the mid-greys in about two frames); its text,
+   icons and hairlines flip exactly at the midpoint (steps). A plain crossfade would hold grey text on
+   a grey bar for most of the swap. chrome.js adds .nav--retint for the length of a swap; hovers keep
+   foundation's own transitions. */
+html.fx-chrome.motion-ok .nav {
+  transition: background-color .3s cubic-bezier(.86, 0, .14, 1), color .3s steps(2, jump-none);
+}
+html.fx-chrome.motion-ok .nav.nav--retint :is(.nav__link, .nav__pause, .skin, .nav__progress, .nav__progress-bar, .nav__progress-head, .nav__logo .period) {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: .3s;
+  transition-timing-function: steps(2, jump-none);
+}
+/* the first theme of a mid-page load snaps (no fade from ink) */
+html.fx-chrome .nav.nav--calm,
+html.fx-chrome .nav.nav--calm *,
+html.fx-chrome .nav.nav--calm *::before { transition: none !important; }
+
+/* the logo period: an LED that glows while the run is moving (scroll velocity, ignite:done) */
+html.fx-chrome.motion-ok .nav__logo .period {
+  transition: background-color .3s var(--ease-out), box-shadow .55s var(--ease-out);
+}
+html.fx-chrome.motion-ok .nav__logo .period.is-live {
+  box-shadow: 0 0 0 1px rgba(214, 250, 87, 0.55), 0 0 14px 4px var(--lime-glow);
+  transition-duration: .3s, .18s;
+}
+html.fx-chrome.motion-ok .nav[data-theme="bone"] .nav__logo .period.is-live {
+  box-shadow: 0 0 0 1.5px var(--bone-ink), 0 0 10px 2px rgba(200, 240, 49, 0.7);
+}
+html.fx-chrome.motion-ok .nav[data-theme="lime"] .nav__logo .period.is-live { box-shadow: 0 0 0 3px rgba(12, 12, 16, 0.16); }
+
+/* ---------- 2. Progress line: bar scaleX (origin right), the head rides its leading edge ---------- */
+/* the head is centred on the leading edge; its opacity and the wrap's translate are scroll-linked.
+   The track clips sideways only (the wrap travels a full width), so the head's glow stays round */
+html.fx-chrome.motion-ok .nav__progress { overflow-x: clip; }
+html.fx-chrome.motion-ok .nav__progress-head {
+  right: -3px;
+  transition: background-color .3s var(--ease-out), box-shadow .3s var(--ease-out);
+}
+/* over bone: an ink bar (--nav-accent) and a lime head held by an ink ring; over lime: an ink head */
+html.fx-chrome.motion-ok .nav[data-theme="bone"] .nav__progress-head { box-shadow: 0 0 0 1.5px var(--bone-ink); }
+html.fx-chrome.motion-ok .nav[data-theme="lime"] .nav__progress-head { background: var(--on-lime); box-shadow: none; }
+
+/* ---------- 3. Tools bus ---------- */
+/* JS drives the track (html.fx-bus): one compositor transform per frame while the band is in view */
+html.fx-bus .marquee__track { will-change: transform; }
+/* a stacking context, so the halo can sit under the logo track and above the band's ink */
+html.fx-chrome.motion-ok .bus { isolation: isolate; }
+
+/* the halo: a soft lime pool where the rail crosses the band (only when the thread draws a rail) */
+.bus__halo { display: none; }
+html.fx-chrome.motion-ok.fx-thread .bus__halo {
+  display: block;
+  position: absolute; z-index: -1;
+  left: var(--rail-x); top: calc(50% - var(--sheet-overlap) / 2);
+  width: 220px; height: 150px;
+  translate: -50% -50%;
+  background: radial-gradient(closest-side, rgba(200, 240, 49, 0.14), rgba(200, 240, 49, 0.06) 55%, rgba(200, 240, 49, 0));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .9s var(--ease-out);
+}
+@media (max-width: 768px) {
+  html.fx-chrome.motion-ok.fx-thread .bus__halo { width: 140px; height: 120px; }
+}
+/* the beam: drawn down the band when the packet taps the bus, with a short flash for the surge */
+html.fx-chrome.motion-ok .bus__beam {
+  transform: scaleY(0); transform-origin: 50% 0;
+  transition: transform .5s var(--ease-io);
+}
+html.fx-chrome.motion-ok .bus.is-live .bus__beam { transform: none; }
+html.fx-chrome.motion-ok .bus.is-live .bus__halo { opacity: 1; }
+html.fx-chrome.motion-ok .bus.is-surging .bus__beam { animation: bus-beam-flash 1.4s var(--ease-out) both; }
+html.fx-chrome.motion-ok .bus.is-surging .bus__halo { animation: bus-halo-flash 1.4s var(--ease-out) both; }
+@keyframes bus-beam-flash {
+  0%, 12% { box-shadow: 0 0 26px 6px var(--lime-glow), 0 0 4px 1px var(--packet-core); }
+  100% { box-shadow: 0 0 16px 2px var(--lime-glow); }
+}
+@keyframes bus-halo-flash {
+  0% { opacity: 0; scale: .7; }
+  18% { opacity: 1; scale: 1.18; }
+  100% { opacity: 1; scale: 1; }
+}
+.bus.is-calm .bus__beam,
+.bus.is-calm .bus__halo { transition: none !important; animation: none !important; }
+
+/* ---------- 4. Magnet: the hit area stays, an inner skin carries every visual ---------- */
+.skin { display: contents; } /* inert unless chrome styles it (a failed package leaves the content as it was) */
+html.fx-chrome.motion-ok [data-magnetic].has-skin {
+  padding: 0; border-width: 0; background: transparent;
+}
+html.fx-chrome.motion-ok [data-magnetic].has-skin > .skin {
+  position: relative; isolation: isolate;
+  display: flex; flex: 1 1 auto; align-items: center;
+  min-width: 0; min-height: inherit;
+  border-radius: inherit;
+  will-change: translate;
+}
+/* the hero WhatsApp CTA: the lime pill moves into the skin */
+html.fx-chrome.motion-ok .btn.has-skin,
+html.fx-chrome.motion-ok .btn.has-skin:hover { background: transparent; }
+html.fx-chrome.motion-ok .btn.has-skin > .skin {
+  justify-content: center; gap: 10px;
+  padding: 0 28px;
+}
+html.fx-chrome.motion-ok .btn--accent.has-skin > .skin { background: var(--lime); color: var(--on-lime); }
+/* the nav CTA: the hairline pill moves into the skin */
+html.fx-chrome.motion-ok .nav__cta.has-skin,
+html.fx-chrome.motion-ok .nav__cta.has-skin:hover { background: transparent; border-color: transparent; color: var(--nav-fg); }
+html.fx-chrome.motion-ok .nav__cta.has-skin > .skin {
+  padding: 0 20px;
+  border: 1px solid var(--nav-line-strong);
+  color: var(--nav-fg);
+  transition: border-color .2s;
+}
+@media (max-width: 600px) {
+  html.fx-chrome.motion-ok .nav__cta.has-skin > .skin { padding: 0 16px; }
+}
+/* the WhatsApp row keeps its full-width fill; its content leans toward the pointer */
+html.fx-chrome.motion-ok .row--wa > * { translate: var(--mx, 0px) var(--my, 0px); }
+
+/* ---------- 5. CTA flood: a circle grows from the pointer's entry point ---------- */
+/* .project__link gets a pill of room for the fill without moving its text (net-zero padding) */
+html.fx-chrome .project__link {
+  padding-inline: 16px; margin-inline: -16px;
+  border-radius: var(--r-pill);
+}
+.flood { display: none; }
+html.fx-chrome.motion-ok .flood {
+  position: absolute; z-index: 1;
+  display: flex; align-items: center;
+  border-radius: inherit;
+  background: var(--flood-bg, var(--lime));
+  color: var(--flood-fg, var(--on-lime));
+  box-shadow: var(--flood-ring, none);
+  white-space: inherit;
+  pointer-events: none;
+  user-select: none; -webkit-user-select: none;
+  clip-path: circle(0px at var(--x, 50%) var(--y, 50%));
+  transition: clip-path .55s var(--ease-out);
+}
+html.fx-chrome.motion-ok .flood svg { flex: none; }
+/* ghost buttons and text links flood lime with ink text; the lime CTA floods ink with lime text */
+html.fx-chrome.motion-ok .btn--ghost .flood,
+html.fx-chrome.motion-ok .project__link .flood { --flood-bg: var(--lime); --flood-fg: var(--on-lime); }
+html.fx-chrome.motion-ok .btn--accent .flood {
+  --flood-bg: var(--ink); --flood-fg: var(--lime);
+  --flood-ring: inset 0 0 0 1.5px var(--lime);
+}
+html.fx-chrome.motion-ok .nav__cta .flood { --flood-bg: var(--nav-accent); --flood-fg: var(--nav-on-accent); }
+/* the text link's arrow keeps its nudge inside the fill */
+html.fx-chrome.motion-ok .project__link .flood svg { transition: transform .25s var(--ease-out); }
+@media (hover: hover) {
+  html.fx-chrome.motion-ok .project__link:hover .flood svg { transform: translateX(-4px); }
+}
+@media (hover: hover) {
+  html.fx-chrome.motion-ok [data-flood]:hover .flood { clip-path: circle(150% at var(--x, 50%) var(--y, 50%)); }
+  /* the flood replaces foundation's instant hover fills */
+  html.fx-chrome.motion-ok .btn--ghost:hover { background: transparent; border-color: var(--lime); }
+}
+html.fx-chrome.motion-ok [data-flood]:focus-visible .flood,
+html.fx-chrome.motion-ok [data-flood].is-pressed .flood { clip-path: circle(150% at var(--x, 50%) var(--y, 50%)); }
+/* touch: the tap point floods and the button gives a little */
+html.fx-chrome.motion-ok .btn,
+html.fx-chrome.motion-ok .project__link { transition: background-color .25s, border-color .25s, color .25s, transform .25s var(--ease-out); }
+html.fx-chrome.motion-ok .nav__cta { transition: transform .25s var(--ease-out); }
+html.fx-chrome.motion-ok [data-flood].is-pressed { transform: scale(.97); }
+
+/* ---------- 6. Reveals: eyebrows rise, titles rise line by line out of a mask ---------- */
+html.fx-chrome.motion-ok [data-reveal]:not(.is-revealed) { opacity: 0; }
+/* the line mask: room on every side for ascents, the highlighter's overhang and the focus ring,
+   without moving a pixel of layout (padding + equal negative margin). The heading is a flex column
+   while it is split, so those negative margins never collapse into each other or out of it. */
+.rv-split { display: flex; flex-direction: column; }
+.rv-line {
+  display: block;
+  overflow: clip;
+  padding: .14em .18em .1em;
+  margin: -.14em -.18em -.1em;
+}
+.rv-in { display: block; }
+.rv-w { white-space: nowrap; }
+
+/* ---------- 7. Highlighter: the lime fill draws right to left with the scroll ---------- */
+html.fx-chrome.motion-ok .hl::before { transform: scaleX(var(--hl, 0)); }
+
+/* ---------- 8. Sheet depth: services recede as the projects sheet rises over them ---------- */
+html.fx-chrome.motion-ok [data-sheet-inner] {
+  position: relative;
+  z-index: var(--z-card); /* the depth transform makes this a stacking context: keep the cards over the wires */
+  transform-origin: 50% 0;
+}
+
+/* ---------- 9. Reduced motion: hover fills are instant colour swaps ---------- */
+@media (hover: hover) {
+  html.fx-chrome:not(.motion-ok) .btn--ghost:hover { background: var(--lime); border-color: var(--lime); color: var(--on-lime); }
+  html.fx-chrome:not(.motion-ok) .btn--accent:hover { background: var(--ink); color: var(--lime); box-shadow: inset 0 0 0 1.5px var(--lime); }
+  html.fx-chrome:not(.motion-ok) .project__link:hover { background: var(--lime); color: var(--on-lime); }
+}

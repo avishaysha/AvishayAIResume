@@ -1,0 +1,64 @@
+/* ==========================================================================
+   Package `ignition`: the headline compiles right to left and its period lands.
+   Everything here is gated on html.fx-ignition (added by init() only when motion is ok), so a stubbed,
+   failed or reduced-motion page keeps the foundation's finished heavy headline.
+   The weight morph is the foundation's compile contract (style.css section 13). The sweeps, ring and
+   glow are WAAPI animations started by ignition.js; this file holds their resting (invisible) styles,
+   the period's held-down state, the headline's colour timing and the no-font cross-fade.
+   ========================================================================== */
+
+/* The headline's colour lands with its weight: the contract colours a glyph from +.3s to +.75s; here it
+   runs +.2s to +.6s, so "שעובדת" is fully lime when its period hits (the period's peak is at the last
+   glyph's +.47s). The weight keeps the contract: .7s, --ease-compile, 32ms stagger. */
+html.fx-ignition .hero__title .ch {
+  transition:
+    font-weight 0.7s var(--ease-compile) calc(var(--i) * 32ms),
+    color 0.4s ease calc(var(--i) * 32ms + 0.2s);
+}
+
+/* the RTL sweep: a 1px lime scan under each line's word as it compiles (at rest: invisible). It hangs
+   off the word span split() makes (.w, inline, one per line), so it hugs the glyphs as they widen and
+   never touches the line boxes. */
+html.fx-ignition .hero__title .w { position: relative; }
+html.fx-ignition .hero__title .w::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0.2em; /* ~.05em under the baseline (Rubik: the baseline sits .253em above the word box) */
+  height: 1px;
+  /* the bright head leads on the left, the direction of travel; the tail fades out behind it */
+  background: linear-gradient(to left, var(--packet-core), var(--lime) 34%, rgba(200, 240, 49, 0));
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* the period: anchors its ring; held down until it lands (a replay has no html.ignite to do it) */
+html.fx-ignition .hero__title .period { position: relative; }
+html.fx-ignition .hero__title.ign-hold .period { transform: scale(0); }
+
+/* the power-on glow, a layer of the token glow whose opacity flashes once (at rest: invisible) */
+html.fx-ignition .hero__title .period::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: var(--glow);
+  opacity: 0;
+  pointer-events: none;
+}
+/* the landing ring (at rest: invisible) */
+html.fx-ignition .hero__title .period::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--lime), 0 0 6px rgba(200, 240, 49, 0.35);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* no Rubik within the font gate: no morph, a 300ms cross-fade to the final headline */
+html.fx-ignition.ign-soft .hero__title .line { transition: color 0.3s var(--ease-out); }
+html.fx-ignition.ign-soft .hero__title .period { transition: transform 0.3s var(--ease-pop); }
