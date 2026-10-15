@@ -1,0 +1,95 @@
+/* Package intake: chips, plate power-on, port flash, canvas fallback.
+   Idea states are gated on html.fx-intake. For the very first paint (before any module runs) the same
+   idea states are also gated on html.motion-ok:not(.js-ready): the head script sets motion-ok, main.js
+   sets js-ready right after every init, and the head-script failsafe removes motion-ok if JS never
+   arrives. So a visitor never sees the finished (crossed-out) look flip back to the idea look, and a
+   failed or stubbed intake still ends on the foundation's static hero (html:not(.fx-intake)). */
+
+/* ---------- the field ---------- */
+html.intake-static .intake__canvas { display: none; }
+
+/* ---------- input chips: the clients' manual work, raw and pending ---------- */
+html.motion-ok:not(.js-ready) .intake__chip > span,
+html.fx-intake .intake__chip > span {
+  text-decoration: none; /* pending, not handled yet */
+  border-color: rgba(243, 242, 238, 0.28);
+  /* background stays the foundation's .88 ink (not .72): chips sit and ride on the light photo, and
+     .72 would drop their #B4B4BE label to ~4.4:1 there; .88 keeps it near 7:1 */
+}
+/* the GL-less fallback keeps the foundation's handled look (crossed out with a lime line) */
+html.fx-intake.intake-static .intake__chip > span {
+  text-decoration: line-through;
+  text-decoration-color: var(--lime);
+  text-decoration-thickness: 2px;
+}
+/* no static hairline lane while the GL lanes run (pre-JS too, so it never flashes) */
+html.motion-ok:not(.js-ready) .node--portrait::before,
+html.fx-intake:not(.intake-static) .node--portrait::before { content: none; }
+
+/* idle drift: the inner span floats ±6px over 5-9s (paused by html.is-paused) */
+@keyframes intake-drift {
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(var(--dx), var(--dy), 0); }
+  100% { transform: translate3d(calc(var(--dx) * -0.55), calc(var(--dy) * 0.7), 0); }
+}
+html.fx-intake .intake__chip > span {
+  animation: intake-drift var(--dd, 7s) ease-in-out var(--de, 0s) infinite alternate;
+}
+.intake__chip[data-chip-i="0"] { --dx: 5px;  --dy: -6px; --dd: 6.4s; --de: -1.2s; }
+.intake__chip[data-chip-i="1"] { --dx: -6px; --dy: 4px;  --dd: 7.8s; --de: -3.9s; }
+.intake__chip[data-chip-i="2"] { --dx: 4px;  --dy: 5px;  --dd: 5.6s; --de: -0.7s; }
+.intake__chip[data-chip-i="3"] { --dx: -5px; --dy: -5px; --dd: 8.6s; --de: -5.1s; }
+.intake__chip[data-chip-i="4"] { --dx: 6px;  --dy: 3px;  --dd: 6.9s; --de: -2.6s; }
+.intake__chip[data-chip-i="5"] { --dx: -4px; --dy: 6px;  --dd: 5.2s; --de: -4.4s; }
+.intake__chip[data-chip-i="6"] { --dx: 5px;  --dy: -4px; --dd: 8.1s; --de: -6.3s; }
+.intake__chip[data-chip-i="7"] { --dx: -6px; --dy: -3px; --dd: 7.3s; --de: -1.9s; }
+
+/* ---------- the plate: dashed "idea" outline, then powered lime wiping out from the input port ---------- */
+html.motion-ok:not(.js-ready) .node__plate,
+html.fx-intake .node__plate {
+  background: transparent;
+  border: 2px dashed rgba(200, 240, 49, 0.45);
+}
+html.motion-ok:not(.js-ready) .node__plate::after,
+html.fx-intake .node__plate::after {
+  content: '';
+  position: absolute;
+  inset: -2px; /* covers the dashed border */
+  border-radius: inherit;
+  background: var(--lime);
+  clip-path: circle(0px at var(--plate-px, 100%) var(--plate-py, 50%));
+}
+html.fx-intake .node--portrait.is-powered .node__plate::after {
+  clip-path: circle(var(--plate-r, 150%) at var(--plate-px, 100%) var(--plate-py, 50%));
+  transition: clip-path 0.7s var(--ease-out);
+}
+html.fx-intake .node--portrait.intake-instant .node__plate::after { transition: none; }
+
+/* ---------- the input port: a ring that flashes as each chip lands ---------- */
+html.fx-intake .node--portrait::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  left: var(--port-x, 100%);
+  top: var(--port-y, 50%);
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  border: 2px solid var(--lime);
+  box-shadow: 0 0 12px 2px var(--lime-glow), inset 0 0 6px var(--lime-glow);
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes intake-port-a {
+  0% { opacity: 1; transform: scale(0.5); }
+  35% { opacity: 0.9; }
+  100% { opacity: 0; transform: scale(3); }
+}
+@keyframes intake-port-b {
+  0% { opacity: 1; transform: scale(0.5); }
+  35% { opacity: 0.9; }
+  100% { opacity: 0; transform: scale(3); }
+}
+html.fx-intake .node--portrait.port-flash::after { animation: intake-port-a 0.65s var(--ease-out) both; }
+html.fx-intake .node--portrait.port-flash.port-flash--b::after { animation-name: intake-port-b; }

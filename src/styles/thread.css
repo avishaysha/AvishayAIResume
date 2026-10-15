@@ -1,0 +1,241 @@
+/* ==========================================================================
+   Package `thread`: the rail, stubs, router, ports, the intro edge and the packet.
+   Every piece is display:none unless html.fx-thread is on, so a stubbed or failed package
+   (main.js removes the class; thread.js removes its nodes) leaves no residue.
+   Wires that live inside a section (rails, stubs, the intro edge, the router fan) take that
+   section's theme tokens (--wire, --route): lime on ink, ink on bone and on the lime finale.
+   Ports, sparks and the packet live in the thread layer (outside the sections), so they carry
+   their theme in data-tt. Lime on bone is only ever a fill inside an ink ring.
+   ========================================================================== */
+
+.thread-rail,
+.thread-stub,
+.thread-port,
+.thread-packet,
+.thread-spark,
+.thread-intro,
+.thread-local,
+.thread-router { display: none; }
+
+html.fx-thread .thread-rail,
+html.fx-thread .thread-stub,
+html.fx-thread .thread-port,
+html.fx-thread .thread-packet,
+html.fx-thread .thread-spark,
+html.fx-thread .thread-intro,
+html.fx-thread .thread-local { display: block; }
+html.fx-thread .thread-router { display: grid; }
+html.fx-thread [data-thread].is-off,
+html.fx-thread.thread-void [data-thread] { display: none; }
+
+/* the services overlay sits inside the sheet's inner wrapper (so the sheet-depth transform carries
+   the ports with their cards); it needs a positioned box, which changes nothing in the layout */
+html.fx-thread [data-sheet-inner] { position: relative; }
+
+/* reveal once the webfonts have settled the layout (thread.js adds .thread-built) */
+html.fx-thread .thread-fade { opacity: 0; transition: opacity 0.6s var(--ease-out); }
+html.fx-thread.thread-built .thread-fade { opacity: 1; }
+html.fx-thread:not(.thread-built) .thread-packet,
+html.fx-thread:not(.thread-built) .thread-intro { visibility: hidden; }
+
+/* ---------- the rail: one 2px wire per section, the part ahead dashed ---------- */
+.thread-rail {
+  position: absolute;
+  z-index: var(--z-wire);
+  width: 24px; /* the 2px wire sits in the middle; the box leaves room for its glow */
+  overflow: hidden;
+  overflow: clip;
+  pointer-events: none;
+}
+.thread-rail__route {
+  position: absolute; top: 0; bottom: 0; left: 11px;
+  width: 2px;
+  background: repeating-linear-gradient(to bottom, var(--route) 0 6px, transparent 6px 12px);
+}
+/* the drawn part: a window translated per frame (thread.js), clipping the wire and its traffic */
+.thread-rail__drawn {
+  position: absolute; top: 0; left: 0;
+  width: 100%;
+  overflow: hidden;
+  transform: translate3d(0, -100%, 0);
+  will-change: transform;
+}
+.thread-rail__wire,
+.thread-rail__traffic { position: absolute; left: 11px; width: 2px; }
+.thread-rail__wire { top: 0; bottom: 0; background: var(--wire); }
+[data-theme="ink"] > .thread-rail .thread-rail__wire { box-shadow: 0 0 10px var(--lime-glow); }
+
+/* traffic: a soft pulse running down the drawn wire (desktop, on-screen rails, never while paused) */
+.thread-rail__traffic { display: none; top: -180px; bottom: 0; }
+[data-theme="ink"] > .thread-rail { --traffic: rgba(246, 255, 214, 0.95); }
+[data-theme="bone"] > .thread-rail { --traffic: rgba(237, 235, 228, 0.5); }
+[data-theme="lime"] > .thread-rail { --traffic: rgba(200, 240, 49, 0.55); }
+@media (min-width: 769px) {
+  html.fx-thread.motion-ok .thread-rail.is-live .thread-rail__traffic {
+    display: block;
+    background: repeating-linear-gradient(to bottom,
+      transparent 0 148px, var(--traffic) 164px, transparent 180px);
+    animation: thread-traffic 2.4s linear infinite;
+    will-change: transform;
+    transition: opacity 0.3s;
+  }
+}
+@keyframes thread-traffic { to { transform: translate3d(0, 180px, 0); } }
+html.is-paused .thread-rail__traffic { opacity: 0; }
+
+/* ---------- stubs: rail -> node edge (and the portrait's output stub: card -> rail) ---------- */
+.thread-stub {
+  position: absolute;
+  z-index: var(--z-wire);
+  height: 2px;
+  pointer-events: none;
+}
+.thread-stub__route,
+.thread-stub__drawn { position: absolute; inset: 0; }
+.thread-stub__route { background: repeating-linear-gradient(to right, var(--route) 0 6px, transparent 6px 11px); }
+.thread-stub--rtl .thread-stub__route { background: repeating-linear-gradient(to left, var(--route) 0 6px, transparent 6px 11px); }
+.thread-stub__drawn {
+  background: var(--wire);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.thread-stub--rtl .thread-stub__drawn { transform-origin: right center; }
+[data-theme="ink"] .thread-stub__drawn { box-shadow: 0 0 8px var(--lime-glow); }
+
+/* ---------- svg wires: the intro edge (hero) and the router fan (services) ---------- */
+.thread-intro,
+.thread-fan {
+  position: absolute; left: 0; top: 0;
+  z-index: var(--z-wire);
+  overflow: visible;
+  pointer-events: none;
+}
+.thread-path { fill: none; stroke-width: 2; }
+.thread-path--route { stroke: var(--route); stroke-dasharray: 6 6; }
+.thread-path--drawn { stroke: var(--wire); }
+[data-theme="ink"] .thread-path--drawn { filter: drop-shadow(0 0 4px var(--lime-glow)); }
+.thread-intro { opacity: 0; transition: opacity 0.35s var(--ease-out); }
+.thread-intro.is-on { opacity: 1; }
+html.fx-thread:not(.motion-ok).thread-built .thread-intro { opacity: 0.7; }
+.thread-local { position: absolute; inset: 0; pointer-events: none; }
+
+/* ---------- ports: 12px sockets on the node edges ---------- */
+.thread-port {
+  position: absolute;
+  z-index: var(--z-ports);
+  width: 12px; height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(243, 242, 238, 0.34);
+  background: var(--ink);
+  pointer-events: none;
+  transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+}
+.thread-port[data-tt="bone"] { border-color: rgba(12, 12, 16, 0.4); background: var(--bone); }
+.thread-port.is-done {
+  border: 1.5px solid var(--lime);
+  background: radial-gradient(circle, var(--ink) 0 2px, var(--lime) 2.6px);
+  box-shadow: 0 0 10px 1px var(--lime-glow);
+}
+.thread-port[data-tt="bone"].is-done {
+  border-color: var(--bone-ink);
+  background: radial-gradient(circle, var(--bone-ink) 0 2px, var(--lime) 2.6px);
+  box-shadow: none;
+}
+.thread-port.is-hidden { opacity: 0 !important; }
+.thread-port__pulse {
+  position: absolute; inset: -1.5px;
+  border-radius: 50%;
+  border: 1.5px solid var(--lime);
+  opacity: 0;
+  pointer-events: none;
+}
+.thread-port[data-tt="bone"] .thread-port__pulse { border-color: var(--bone-ink); }
+
+/* ---------- the router: on the rail in the services lane ---------- */
+.thread-router {
+  position: absolute;
+  z-index: calc(var(--z-wire) + 1);
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bone);
+  color: rgba(12, 12, 16, 0.5);
+  box-shadow: inset 0 0 0 1.5px rgba(12, 12, 16, 0.3);
+  pointer-events: none;
+  transition: background-color 0.35s var(--ease-out), color 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+}
+.thread-router svg { width: 58%; height: 58%; display: block; }
+.thread-router.is-done {
+  background: var(--lime);
+  color: var(--bone-ink);
+  box-shadow: inset 0 0 0 1.5px var(--bone-ink);
+}
+/* < 1024px: a small x3 mark on the rail */
+.thread-router--mark {
+  translate: -50% -50%;
+  height: 18px; padding: 0 5px;
+  border-radius: var(--r-pill);
+  font: 500 10px/1 var(--font-mono);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* ---------- sparks: one-shot dots that run a stub or a branch, then slip under the card ---------- */
+.thread-spark {
+  position: absolute; left: 0; top: 0;
+  z-index: var(--z-packet);
+  width: 7px; height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: var(--packet-core);
+  box-shadow: 0 0 10px 2px var(--lime-glow);
+  pointer-events: none;
+  will-change: transform;
+}
+.thread-spark[data-tt="bone"] { background: var(--lime); box-shadow: 0 0 0 1.5px var(--bone-ink); }
+.thread-spark--packet { width: 10px; height: 10px; margin: -5px 0 0 -5px; box-shadow: 0 0 14px 3px var(--lime-glow); }
+
+/* ---------- the packet: the dot that carries the work ---------- */
+.thread-packet {
+  position: absolute; left: 0; top: 0;
+  z-index: var(--z-packet);
+  width: 0; height: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.thread-packet__body {
+  position: absolute; left: 0; top: 0;
+  opacity: 0;
+  transition: opacity 0.2s linear;
+}
+.thread-packet.is-on .thread-packet__body { opacity: 1; }
+.thread-packet.is-on.is-docked .thread-packet__body { opacity: 0; transition-duration: 0.12s; }
+.thread-packet__dot {
+  position: absolute; left: -5px; top: -5px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--packet-core);
+  box-shadow: 0 0 14px 3px var(--lime-glow);
+}
+/* the comet tail, on the side opposite to travel (thread.js flips and scales it with speed) */
+.thread-packet__tail {
+  position: absolute; left: -3px; top: -60px;
+  width: 6px; height: 60px;
+  transform-origin: 50% 100%;
+  transform: scaleY(0);
+  background: linear-gradient(to top, rgba(228, 255, 122, 0.9), rgba(200, 240, 49, 0));
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.thread-packet[data-tt="bone"] .thread-packet__dot,
+.thread-packet[data-tt="lime"] .thread-packet__dot { background: var(--lime); box-shadow: 0 0 0 2px var(--bone-ink); }
+.thread-packet[data-tt="bone"] .thread-packet__tail,
+.thread-packet[data-tt="lime"] .thread-packet__tail { background: linear-gradient(to top, rgba(12, 12, 16, 0.55), rgba(12, 12, 16, 0)); }
+/* parked on the output port, waiting for the visitor to scroll (paused by html.is-paused) */
+.thread-packet.is-parked .thread-packet__body { animation: thread-bob 1.8s var(--ease-io) infinite alternate; }
+@keyframes thread-bob {
+  from { translate: 0 -2.5px; }
+  to { translate: 0 2.5px; }
+}
+
+/* ---------- reduced motion: one still circuit, fully drawn, at 70% ---------- */
+html.fx-thread:not(.motion-ok).thread-built .thread-fade { opacity: 0.7; }
